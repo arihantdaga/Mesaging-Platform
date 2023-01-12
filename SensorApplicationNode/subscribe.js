@@ -5,6 +5,7 @@ const mqtt = require('mqtt')
 const clientID = 'MQTTB_PUBLISHER_NODE_'+randomUUID()
 
 const topic = 'KU/sensor/+/temperature'
+const vm = require('./victoriametrics')
 const rate = 100
 let count = 0
 let start = 0
@@ -23,6 +24,8 @@ async function main(){
 
 async function handleMessage(topic, message){
     count++
+    const device_id = topic.split('/')[2]
+    vm.QueueMessage(device_id, message)
     if (count % rate == 0){
         console.log(`Received ${count} messages, time: ${Date.now() - start} ms}`)
         start = Date.now()
