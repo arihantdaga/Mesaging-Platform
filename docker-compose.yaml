@@ -1,9 +1,40 @@
 version: "3.5"
 services: 
+  vmagent:
+    container_name: vmagent
+    image: victoriametrics/vmagent:latest
+    depends_on:
+      - "victoria-metrics"
+    ports:
+      - 8429:8429
+    volumes:
+      - ./vmagentdata:/vmagentdata
+    command:
+      - "--remoteWrite.url=http://victoria-metrics:8428/api/v1/write"
   victoria-metrics: 
-    image: victoriametrics/victoria-metrics
+    image: victoriametrics/victoria-metrics:latest
     ports: 
       - "8428:8428"
     volumes:
       - ./victoria-metrics-data:/victoria-metrics-data
+    command:
+      - "--vmalert.proxyURL=http://vmalert:8880"
+      - "--retentionPeriod=1"
+      - "-selfScrapeInterval=10s"
+
+  emqx1:
+    image: emqx/emqx:latest
+    environment:
+    - "EMQX_NAME=emqx"
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "18083:18083"
+  
     
+  grafana:
+    image: grafana/grafana-oss:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana-data:/var/lib/grafana
