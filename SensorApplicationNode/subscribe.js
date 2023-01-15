@@ -4,14 +4,13 @@ const mqtt = require('mqtt')
 
 const clientID = 'MQTTB_PUBLISHER_NODE_'+randomUUID()
 
-const topic = 'KU/sensor/+/temperature'
+const topic = '$share/1/KU/sensor/+/temperature'
 const vm = require('./victoriametrics')
 const rate = 100
 let count = 0
-let start = 0
 
 async function main(){
-    const client  = mqtt.connect('mqtt://test.mosquitto.org', {clientId: clientID, autoReconnect: true})
+    const client  = mqtt.connect('mqtt://localhost', {clientId: clientID, autoReconnect: true})
     client.on('connect', () => {
         console.log('Connected to MQTT Broker')
         client.subscribe(topic)
@@ -27,7 +26,7 @@ async function handleMessage(topic, message){
     const device_id = topic.split('/')[2]
     vm.QueueMessage(device_id, message)
     if (count % rate == 0){
-        console.log(`Received ${count} messages, time: ${Date.now() - start} ms}`)
+        // console.log(`Received ${count} messages, time: ${Date.now() - start} ms}`)
         start = Date.now()
     }
 }

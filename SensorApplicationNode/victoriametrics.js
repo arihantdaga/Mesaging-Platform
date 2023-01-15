@@ -3,7 +3,7 @@ const buffer = Array(1000)
 let index = 0
 const influx = new Influx.InfluxDB({
     host: 'localhost',
-    port: 8428,
+    port: 8429,
     database: 'sensors_db',
     schema: [
         {
@@ -32,6 +32,8 @@ function QueueMessage(device_id, temperature) {
             }
         })).catch(err => {
             console.error(`Error saving data to InfluxDB! ${err.stack}`)
+        }).then(()=>{
+            console.log("Done writing to VictoriaMetrics")
         })
     }
     buffer[index++] = { device_id, temperature }
